@@ -25,9 +25,9 @@ class ViewController: UIViewController {
         setGravity()
         setCollision()
 
-        collision?.action = {
-            print("\(NSStringFromCGAffineTransform(self.square.transform))\(NSStringFromCGPoint(self.square.center))")
-        }
+//        collision?.action = {
+//            print("\(NSStringFromCGAffineTransform(self.square.transform))\(NSStringFromCGPoint(self.square.center))")
+//        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -55,6 +55,8 @@ class ViewController: UIViewController {
     private func setCollision() {
 //        collision = UICollisionBehavior(items: [square, barrier])
         collision = UICollisionBehavior(items: [square])
+        collision?.collisionDelegate = self
+
         collision?.addBoundary(withIdentifier: "barrier" as NSCopying, for: UIBezierPath(rect: barrier.frame))
         collision?.translatesReferenceBoundsIntoBoundary = true
         guard let col = collision else { return }
@@ -62,3 +64,15 @@ class ViewController: UIViewController {
     }
 }
 
+// TODO: 次回はConfiguring item propertiesから
+extension ViewController: UICollisionBehaviorDelegate {
+    func collisionBehavior(_ behavior: UICollisionBehavior, beganContactFor item: UIDynamicItem, withBoundaryIdentifier identifier: NSCopying?, at p: CGPoint) {
+        print("Boundary contact occurred - \(identifier)")
+
+        let collidingView = item as! UIView
+        collidingView.backgroundColor = UIColor.yellow
+        UIView.animate(withDuration: 0.3) { 
+            collidingView.backgroundColor = UIColor.gray
+        }
+    }
+}
